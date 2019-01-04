@@ -1,1 +1,5 @@
 GraphQL-ExFiles/**
+src/.idea/**
+src/**/bin/**
+src/**/obj/**
+src/Orders-GraphQL.sln.DotSettings.user
