@@ -28,6 +28,7 @@ namespace Orders.Models
     Created = 2,
     Processing = 4,
     Completed = 8,
-    Cancelled = 16
+    Cancelled = 16, 
+    Closed = 32
   }
 }
