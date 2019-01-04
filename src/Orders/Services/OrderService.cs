@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Orders.Models;
 
@@ -10,11 +11,15 @@ namespace Orders.Services
     {
         Task<Order> GetOrderByIdAsync(string id);
         Task<IEnumerable<Order>> GetOrdersAsync();
+
+        Task<Order> CreateAsync(Order order);
+        Task<Order> StartAsync(string orderId);
+        
     }
 
     public class OrderService : IOrderService
     {
-        private IList<Order> _orders;
+        private readonly IList<Order> _orders;
 
         public OrderService()
         {
@@ -37,6 +42,30 @@ namespace Orders.Services
         public Task<IEnumerable<Order>> GetOrdersAsync()
         {
             return Task.FromResult(_orders.AsEnumerable());
+        }
+
+        public Task<Order> CreateAsync(Order order)
+        {
+            _orders.Add(order);
+            return Task.FromResult(order);
+        }
+
+        private Order GetById(string id)
+        {
+            var order = _orders.SingleOrDefault(o => Equals(o.Id, id));
+            if (order == null)
+            {
+                throw new ArgumentException($"Id {id} is invalid");
+            }
+
+            return order;
+        }
+
+        public Task<Order> StartAsync(string orderId)
+        {
+            var order = GetById(orderId);
+            order.Start();
+            return Task.FromResult(order);
         }
     }
     
