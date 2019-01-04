@@ -1,4 +1,6 @@
-﻿using GraphQL;
+﻿using System;
+using GraphQL;
+using GraphQL.Server;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -10,6 +12,13 @@ namespace Server
 {
     public class Startup
     {
+        public IHostingEnvironment Environment { get; }
+
+        public Startup(IHostingEnvironment environment)
+        {
+            Environment = environment;
+        }
+        
         // This method gets called by the runtime. Use this method to add services to the container.
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
@@ -25,6 +34,13 @@ namespace Server
 
             services.AddSingleton<IDependencyResolver>(c =>
                 new FuncDependencyResolver(c.GetRequiredService));
+
+            services.AddGraphQL(options =>
+            {
+                options.EnableMetrics = true;
+                options.ExposeExceptions = Environment.IsDevelopment();
+            }).AddWebSockets();
+            
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -37,6 +53,12 @@ namespace Server
 
             app.UseDefaultFiles();
             app.UseStaticFiles();
+
+            app.UseWebSockets();
+            app.UseGraphQLWebSockets<OrdersSchema>("/graphQL");
+            app.UseGraphQL<OrdersSchema>("/graphQL");
+            
+
         }
     }
 }
